@@ -164,8 +164,6 @@ attachmentWasDisconnectedWithError:(NSError *)error {
             view = [[VZVirtualMachineView alloc] init];
             view.capturesSystemKeys = YES;
             view.virtualMachine = vz;
-            //NSRect rect = NSMakeRect(10, 10, 1024, 768);
-
             window = [[NSWindow alloc] initWithContentRect: spec->window_rect
                                                  styleMask:NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|
                       NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable//|NSTexturedBackgroundWindowMask
@@ -174,7 +172,7 @@ attachmentWasDisconnectedWithError:(NSError *)error {
             [window setDelegate: self];
             [window setContentView: view];
             [window setInitialFirstResponder: view];
-			[window setTitle: spec->window_title];
+            [window setTitle: spec->window_title];
 
             if (![NSApp mainMenu]) { /* normally, there is no menu so we have to create it */
                 NSLog(@"Create menu ...");
@@ -454,46 +452,46 @@ int main(int ac, char**av) {
 	    if (!strcmp(av[i], "--recovery")) {
 		spec->use_recovery = YES; continue;
 	    }
-		if (!strcmp(av[i], "--title")) {
-			if (++i >= ac) {
-				fprintf(stderr, "ERROR: %s missing title", av[i-1]);
-				return 1;
-			}
-			spec->window_title = [NSString stringWithUTF8String: av[i]];
-		}
-		if (!strcmp(av[i], "--window")) {
-			if (++i >= ac) {
-				fprintf(stderr, "ERROR: %s window settings", av[i-1]);
-				return 1;
-			}
-			NSString *window_value = [NSString stringWithUTF8String: av[i]];
-			NSRect rect = NSMakeRect(10, 10, 1024, 768);
-
-			NSArray *coordinates = [window_value componentsSeparatedByString:@"."];
-			if ([coordinates count] < 4) {
-				spec->window_rect = rect;
-			}
-			for (int i=0; i<4; i++)
-			{
-				NSInteger x = [[[coordinates objectAtIndex:i] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] integerValue];
-				
-				switch (i) {
-					case 0:
-						rect.origin.x = x;
-						break;
-					case 1:
-						rect.origin.y = x;
-						break;
-					case 2:
-						rect.size.width = x;
-						break;
-					case 3:
-						rect.size.height = x;
-						break;
-				}
-			}
-			spec->window_rect = rect;
-		}
+        if (!strcmp(av[i], "--title")) {
+            if (++i >= ac) {
+                fprintf(stderr, "ERROR: %s missing title", av[i-1]);
+                return 1;
+            }
+            spec->window_title = [NSString stringWithUTF8String: av[i]];
+        }
+        if (!strcmp(av[i], "--window")) {
+            if (++i >= ac) {
+                fprintf(stderr, "ERROR: %s window settings", av[i-1]);
+                return 1;
+            }
+            NSString *window_value = [NSString stringWithUTF8String: av[i]];
+            NSRect rect = NSMakeRect(10, 10, 1024, 768);
+            
+            NSArray *coordinates = [window_value componentsSeparatedByString:@"."];
+            if ([coordinates count] < 4) {
+                spec->window_rect = rect;
+            }
+            for (int i=0; i<4; i++)
+            {
+                NSInteger x = [[[coordinates objectAtIndex:i] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] integerValue];
+                
+                switch (i) {
+                    case 0:
+                        rect.origin.x = x;
+                        break;
+                    case 1:
+                        rect.origin.y = x;
+                        break;
+                    case 2:
+                        rect.size.width = x;
+                        break;
+                    case 3:
+                        rect.size.height = x;
+                        break;
+                }
+            }
+            spec->window_rect = rect;
+        }
 	    if (!strcmp(av[i], "--mac")) {
                 if (++i >= ac) {
                     fprintf(stderr, "ERROR: %s missing MAC address", av[i-1]);

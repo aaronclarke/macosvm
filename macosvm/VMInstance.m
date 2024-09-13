@@ -27,8 +27,8 @@
     pty = NO;
     spice = NO;
     ptyPath = nil;
-	window_title = @"VirtualMachine";
-	window_rect = NSMakeRect(10, 10, 1024, 768);
+    window_title = @"VirtualMachine";
+    window_rect = NSMakeRect(10, 10, 1024, 768);
     return self;
 }
 
