@@ -27,6 +27,8 @@
     int cpus;
     unsigned long ram;
     BOOL audio, use_serial, pty, spice, use_recovery;
+	NSString *window_title;
+	NSRect window_rect;
 }
 
 #ifdef MACOS_GUEST

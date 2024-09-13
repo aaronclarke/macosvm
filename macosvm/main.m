@@ -164,8 +164,9 @@ attachmentWasDisconnectedWithError:(NSError *)error {
             view = [[VZVirtualMachineView alloc] init];
             view.capturesSystemKeys = YES;
             view.virtualMachine = vz;
-            NSRect rect = NSMakeRect(10, 10, 1024, 768);
-            window = [[NSWindow alloc] initWithContentRect: rect
+            //NSRect rect = NSMakeRect(10, 10, 1024, 768);
+
+            window = [[NSWindow alloc] initWithContentRect: spec->window_rect
                                                  styleMask:NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|
                       NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable//|NSTexturedBackgroundWindowMask
                                                    backing:NSBackingStoreBuffered defer:NO];
@@ -173,7 +174,7 @@ attachmentWasDisconnectedWithError:(NSError *)error {
             [window setDelegate: self];
             [window setContentView: view];
             [window setInitialFirstResponder: view];
-            [window setTitle: @"VirtualMac"];
+			[window setTitle: spec->window_title];
 
             if (![NSApp mainMenu]) { /* normally, there is no menu so we have to create it */
                 NSLog(@"Create menu ...");
@@ -362,7 +363,7 @@ int main(int ac, char**av) {
 
     /* options that require an argument so we can skip them */
     const char *multi_options[] = {
-        "--restore", "--vol", "--disk", "--usb", "--aux", "--initrd", "--net", "--save", "--mac", 0
+        "--restore", "--vol", "--disk", "--usb", "--aux", "--initrd", "--net", "--save", "--mac", "--title", "--window",0
     };
     /* in retrospect this was a bad idea, but we have to find the config file
        first since we want the options to override the contents of the config
@@ -453,6 +454,46 @@ int main(int ac, char**av) {
 	    if (!strcmp(av[i], "--recovery")) {
 		spec->use_recovery = YES; continue;
 	    }
+		if (!strcmp(av[i], "--title")) {
+			if (++i >= ac) {
+				fprintf(stderr, "ERROR: %s missing title", av[i-1]);
+				return 1;
+			}
+			spec->window_title = [NSString stringWithUTF8String: av[i]];
+		}
+		if (!strcmp(av[i], "--window")) {
+			if (++i >= ac) {
+				fprintf(stderr, "ERROR: %s window settings", av[i-1]);
+				return 1;
+			}
+			NSString *window_value = [NSString stringWithUTF8String: av[i]];
+			NSRect rect = NSMakeRect(10, 10, 1024, 768);
+
+			NSArray *coordinates = [window_value componentsSeparatedByString:@"."];
+			if ([coordinates count] < 4) {
+				spec->window_rect = rect;
+			}
+			for (int i=0; i<4; i++)
+			{
+				NSInteger x = [[[coordinates objectAtIndex:i] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] integerValue];
+				
+				switch (i) {
+					case 0:
+						rect.origin.x = x;
+						break;
+					case 1:
+						rect.origin.y = x;
+						break;
+					case 2:
+						rect.size.width = x;
+						break;
+					case 3:
+						rect.size.height = x;
+						break;
+				}
+			}
+			spec->window_rect = rect;
+		}
 	    if (!strcmp(av[i], "--mac")) {
                 if (++i >= ac) {
                     fprintf(stderr, "ERROR: %s missing MAC address", av[i-1]);
@@ -668,6 +709,7 @@ int main(int ac, char**av) {
            [--{disk|usb} <path>[,ro][,size=<spec>][,keep]] [--aux <path>]\n\
            [--vol <path>[,ro][,{name=<name>|automount}]]\n\
            [--net <spec>] [--mac <addr>] [-c <cpu>] [-r <ram>]\n\
+		   [--title <window_title>] [--window <x.y.width.height>]\n\
            [--no-serial] [--pty]   <config.json>\n\
         %s --version\n\
         %s -h\n\
@@ -687,6 +729,12 @@ int main(int ac, char**av) {
 \n\
  Note that the --mac option is special and will override the first interface\n\
  from the configuration file and/or --net (typically used with --ephemeral).\n\
+\n\
+ --title option sets the title for the VM window. Default is 'VirtualMac'.\n\
+\n\
+ --window option sets the location and size for the VM window.\n\
+ The argument value must be in the form 'x_origin.y_origin.width.height' where all values are in pixels.\n\
+ Note that x,y values establish the lower left origin of the window. Default is 10.10.1024.768. \n\
 \n\
  Examples:\n\
  # create a new VM with 32Gb disk image and macOS 12:\n\
