@@ -45,7 +45,7 @@ static const char *version = "0.2-2";
     NSLog(@"Window will close");
 }
 
-static void cleanup();
+static void cleanup(void);
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
     cleanup();
@@ -300,7 +300,8 @@ void add_unlink_on_exit(const char *fn) {
     fprintf(stderr, "ERROR: too many ephemeral files, aborting\n");
     exit(1);
 }
-static void cleanup() {
+
+static void cleanup(void) {
     int i = 0;
     while (i < MAX_UNLINKS) {
         if (unlink_me[i]) {
@@ -332,7 +333,7 @@ static void sig_handler(int sig) {
 
 static int unlink_handling_active = 0;
 
-static void setup_unlink_handling() {
+static void setup_unlink_handling(void) {
     if (unlink_handling_active)
         return;
 
