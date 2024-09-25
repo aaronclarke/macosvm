@@ -459,6 +459,7 @@ int main(int ac, char**av) {
                 return 1;
             }
             spec->window_title = [NSString stringWithUTF8String: av[i]];
+			continue;
         }
         if (!strcmp(av[i], "--window")) {
             if (++i >= ac) {
@@ -492,6 +493,7 @@ int main(int ac, char**av) {
                 }
             }
             spec->window_rect = rect;
+			continue;
         }
 	    if (!strcmp(av[i], "--mac")) {
                 if (++i >= ac) {
